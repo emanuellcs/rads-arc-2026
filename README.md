@@ -198,12 +198,46 @@ where $\delta = 0.05$ tolerates floating-point variation across parallel TRM eva
 
 MCTS requires thousands of TRM evaluations per game. Running evaluations synchronously from CPU worker threads hits Python's GIL, serializing all GPU calls and reducing effective throughput to ~80 evaluations/second. RADS bypasses the GIL with a dedicated GPU server process connected to CPU workers via shared memory:
 
-```
-CPU Worker 0 ──┐                              ┌── Result Queue 0
-CPU Worker 1 ──┼──► Token Queue ──► GPU    ──┼── Result Queue 1
-CPU Worker 2 ──┤    (slot_ids)     Batch   ──┼── Result Queue 2
-CPU Worker 3 ──┘    Shared Mem     Server  └── Result Queue 3
-                    (states, scores)
+```mermaid
+flowchart LR
+    %% Styling
+    classDef worker fill:#f8fbff,stroke:#2b6cb0,stroke-width:1.5px,color:#1a202c
+    classDef queue fill:#edf2f7,stroke:#4a5568,stroke-width:1.5px,color:#1a202c
+    classDef server fill:#fffaf0,stroke:#dd6b20,stroke-width:2px,color:#1a202c
+    classDef memory fill:#f3e8ff,stroke:#6b46c1,stroke-width:1.5px,stroke-dasharray: 5 5,color:#1a202c
+
+    subgraph Input [ ]
+        direction TB
+        W0([CPU Worker 0]):::worker
+        W1([CPU Worker 1]):::worker
+        W2([CPU Worker 2]):::worker
+        W3([CPU Worker 3]):::worker
+    end
+
+    subgraph CommLayer [Data & Control]
+        direction TB
+        TQ[\"Token Queue<br/>(slot_ids)"/]:::queue
+        SM[("Shared Mem<br/>(states, scores)")]:::memory
+    end
+
+    GPU{{"GPU Batch<br/>Server"}}:::server
+
+    subgraph Output [ ]
+        direction TB
+        R0[\"Result Queue 0"/]:::queue
+        R1[\"Result Queue 1"/]:::queue
+        R2[\"Result Queue 2"/]:::queue
+        R3[\"Result Queue 3"/]:::queue
+    end
+
+    %% Flow connections
+    W0 & W1 & W2 & W3 -->|Push| TQ
+    TQ ==>|Batch Pull| GPU
+    GPU -->|Dispatch| R0 & R1 & R2 & R3
+
+    %% Shared memory interactions (implied data plane)
+    W0 & W1 & W2 & W3 -.->|Write| SM
+    SM -.->|Read| GPU
 ```
 
 CPU workers write game states to **pre-allocated shared memory slots** and push slot IDs to a shared queue, then suspend. The GPU batch server polls the queue, batches pending requests dynamically (flush at 64 requests or 10ms timeout), executes a single batched TRM forward pass (one `cudaGraphLaunch`), writes float scores back to shared memory, and notifies workers. Workers resume and continue tree expansion. The GPU is never idle; Python overhead never blocks GPU compute.
