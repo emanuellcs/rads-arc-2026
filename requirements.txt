@@ -1,0 +1,21 @@
+# ==========================================
+# RADS Architecture Dependencies
+# ARC Prize 2026
+# ==========================================
+
+# --- Core Neural Framework ---
+torch          # The backbone framework; handles dynamic graphs, SDPA dispatcher, and IPC shared memory
+torchvision    # Used for CPU-bound geometric grid augmentations (rotations, transpositions)
+numpy          # Essential for grid array manipulation and multi-process memory mapping
+
+# --- Generative Prior & Quantization ---
+transformers   # Hugging Face ecosystem for loading the base 8B Masked Diffusion model
+peft           # Parameter-Efficient Fine-Tuning; used for hot-swapping Rank-32 LoRA adapters
+bitsandbytes   # Required for loading the 8B base model in 4-bit NormalFloat (NF4) precision
+
+# --- Low-Level Memory Optimizations ---
+xformers       # Provides the 'sdpa_mem_eff' FlashAttention fallback kernel for T4 (Turing) Tensor Cores
+unsloth        # Crucial for the fused 2D Rotary Positional Encodings (RoPE) and fast inference
+
+# --- ARC-AGI Environment Toolkits ---
+arc-agi        # The official ARC Prize toolkit for the ARC-AGI-3 interactive games and Scorecard API
