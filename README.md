@@ -247,7 +247,7 @@ CPU workers write game states to **pre-allocated shared memory slots** and push 
 ## Repository Structure
 
 ```
-rads-arc-2026/
+rads/
 │
 ├── data/
 │   ├── dataset.py             # CoW-free ARCDataset + worker_init_fn
@@ -281,8 +281,8 @@ rads-arc-2026/
 Requires a CUDA 12.1+ environment. All dependencies are pinned in `requirements.txt` for reproducibility.
 
 ```bash
-git clone https://github.com/emanuellcs/rads-arc-2026.git
-cd rads-arc-2026
+git clone https://github.com/emanuellcs/rads.git
+cd rads
 
 # Recommended: isolated virtual environment
 python -m venv .venv && source .venv/bin/activate
@@ -375,7 +375,7 @@ If you use RADS or any component of this work in your research, please cite:
   title        = {RADS: Recursive Active-Diffusion Synthesis for Unified Abstract Reasoning},
   author       = {Emanuel Lázaro},
   year         = {2026},
-  howpublished = {\url{https://github.com/emanuellcs/rads-arc-2026}},
+  howpublished = {\url{https://github.com/emanuellcs/rads}},
   note         = {ARC Prize 2026 Competition Entry}
 }
 ```
