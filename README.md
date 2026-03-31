@@ -1,6 +1,12 @@
+<div align="center">
+
 # RADS: Recursive Active-Diffusion Synthesis
 
-<div align="center">
+**Emanuel Lázaro**<br>
+*Independent Researcher*<br>
+[`emanuellzr01@outlook.com`](mailto:emanuellzr01@outlook.com)
+
+<br>
 
 [![ARC Prize 2026](https://img.shields.io/badge/ARC_Prize_2026-Competitor-blue)](https://arcprize.org/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-yellow.svg)](https://opensource.org/licenses/Apache-2.0)
@@ -24,7 +30,7 @@ The **Abstraction and Reasoning Corpus (ARC)**, designed by François Chollet, i
 Here is what a representative task looks like in practice. The system is shown three demonstration pairs:
 
 ```mermaid
-flowchart LR
+flowchart TB
     subgraph Pair1 [Train pair 1]
         direction LR
         I1["[■ □ □]<br>[□ □ □]<br>[□ □ □]"] -- "Transforms to" --> O1["[■ □ □]<br>[■ □ □]<br>[■ □ □]"]
@@ -40,7 +46,9 @@ flowchart LR
         I3["[□ □ ■]<br>[□ □ □]<br>[□ □ □]"] -- "Transforms to" --> O3["[□ □ ■]<br>[□ □ ■]<br>[□ □ ■]"]
     end
 
-    %% Optional styling to make the text monospace for perfect alignment
+    Pair1 ~~~ Pair2
+    Pair2 ~~~ Pair3
+
     classDef grid font-family:monospace, text-align:center;
     class I1,O1,I2,O2,I3,O3 grid;
 ```
